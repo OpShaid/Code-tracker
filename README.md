@@ -4,7 +4,7 @@ simple timer to track your daily coding sessions. set a goal, track your time, a
 
 ## demo
 
-[watch the video](your-video-link-here) or check out the [live demo](your-demo-link-here)
+[watch the video](https://youtu.be/nMA5RNkq9kw?si=T52Z7RraBa8azP11) or check out the [live demo](https://youtu.be/nMA5RNkq9kw?si=T52Z7RraBa8azP11)
 
 ## install
 

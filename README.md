@@ -17,6 +17,3 @@ simple timer to track your daily coding sessions. set a goal, track your time, a
 
 features: pause/resume, 5 min milestones, progress bar, all-time stats that never reset
 
----
-
-MIT license - do whatever

@@ -2,6 +2,10 @@
 
 simple timer to track your daily coding sessions. set a goal, track your time, and build up your all-time stats. resets daily but saves everything to your total.
 
+## demo
+
+[watch the video](your-video-link-here) or check out the [live demo](your-demo-link-here)
+
 ## install
 
 1. download `coding-tracker.html`

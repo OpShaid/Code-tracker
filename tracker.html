@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coding Time Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .input-section, .timer-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 18px;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+            transition: width 0.5s;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+
+        .timer-display {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .timer-display .time {
+            font-size: 4em;
+            font-weight: bold;
+            color: white;
+            line-height: 1;
+        }
+
+        .timer-display .label {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 10px;
+        }
+
+        .milestone {
+            text-align: center;
+            color: #fbbf24;
+            font-weight: 600;
+            margin-top: 10px;
+            animation: pulse 1s infinite;
+        }
+
+        .goal-reached {
+            text-align: center;
+            color: #10b981;
+            font-weight: 600;
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.3);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .alltime-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .alltime-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alltime-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .alltime-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .alltime-note {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Code Tracker</h1>
+
+        <div id="inputSection" class="input-section">
+            <label>How many minutes do you want to code today?</label>
+            <input type="number" id="targetInput" placeholder="Enter minutes..." min="1">
+            <button class="btn-primary" onclick="startSession()">🎯 Start Session</button>
+        </div>
+
+        <div id="timerSection" class="timer-section hidden">
+            <div class="progress-box">
+                <div class="progress-header">
+                    <span>Today's Goal</span>
+                    <span id="goalDisplay">0m</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% complete</div>
+            </div>
+
+            <div class="timer-display">
+                <div class="time" id="currentTime">0m</div>
+                <div class="label">Current Session</div>
+                <div id="goalReached" class="goal-reached hidden">🎉 Goal Reached!</div>
+                <div id="milestone" class="milestone hidden"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary" id="toggleBtn" onclick="toggleTimer()">⏸️ Pause</button>
+                <button class="btn-danger" onclick="resetSession()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <div class="alltime-section">
+            <div class="alltime-header">
+                <div class="alltime-label">📈 All-Time Total</div>
+                <div class="alltime-value" id="alltimeDisplay">0m</div>
+            </div>
+            <div class="alltime-note">Never resets</div>
+        </div>
+    </div>
+
+    <script>
+        let targetMinutes = 0;
+        let currentMinutes = 0;
+        let allTimeMinutes = 0;
+        let isRunning = false;
+        let timerInterval = null;
+        let lastMilestone = 0;
+
+        // Load all-time minutes from localStorage
+        function loadAllTime() {
+            const saved = localStorage.getItem('alltime_coded');
+            if (saved) {
+                allTimeMinutes = parseFloat(saved);
+                updateAllTimeDisplay();
+            }
+        }
+
+        // Save all-time minutes to localStorage
+        function saveAllTime() {
+            localStorage.setItem('alltime_coded', allTimeMinutes.toString());
+        }
+
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = Math.floor(minutes % 60);
+            if (hours > 0) {
+                return `${hours}h ${mins}m`;
+            }
+            return `${mins}m`;
+        }
+
+        function updateAllTimeDisplay() {
+            document.getElementById('alltimeDisplay').textContent = formatTime(allTimeMinutes);
+        }
+
+        function updateCurrentDisplay() {
+            document.getElementById('currentTime').textContent = formatTime(currentMinutes);
+        }
+
+        function updateProgress() {
+            const progress = (currentMinutes / targetMinutes) * 100;
+            document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '% complete';
+
+            // Check if goal reached
+            if (currentMinutes >= targetMinutes) {
+                document.getElementById('goalReached').classList.remove('hidden');
+            }
+
+            // Check for 5-minute milestones
+            const currentMilestone = Math.floor(currentMinutes / 5) * 5;
+            if (currentMilestone > lastMilestone && currentMilestone > 0) {
+                lastMilestone = currentMilestone;
+                const milestoneEl = document.getElementById('milestone');
+                milestoneEl.textContent = `⚡ ${currentMilestone} minutes milestone!`;
+                milestoneEl.classList.remove('hidden');
+                setTimeout(() => {
+                    milestoneEl.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        function startSession() {
+            const input = document.getElementById('targetInput').value;
+            targetMinutes = parseInt(input);
+            
+            if (!targetMinutes || targetMinutes <= 0) {
+                alert('Please enter a valid number of minutes!');
+                return;
+            }
+
+            document.getElementById('inputSection').classList.add('hidden');
+            document.getElementById('timerSection').classList.remove('hidden');
+            document.getElementById('goalDisplay').textContent = targetMinutes + 'm';
+            
+            currentMinutes = 0;
+            lastMilestone = 0;
+            updateCurrentDisplay();
+            updateProgress();
+            
+            isRunning = true;
+            startTimer();
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (isRunning) {
+                    currentMinutes += 1/12; // 5 seconds = 1/12 minute
+                    allTimeMinutes += 1/12;
+                    
+                    updateCurrentDisplay();
+                    updateAllTimeDisplay();
+                    updateProgress();
+                    saveAllTime();
+                }
+            }, 5000); // Update every 5 seconds
+        }
+
+        function toggleTimer() {
+            isRunning = !isRunning;
+            const btn = document.getElementById('toggleBtn');
+            if (isRunning) {
+                btn.textContent = '⏸️ Pause';
+            } else {
+                btn.textContent = '▶️ Resume';
+            }
+        }
+
+        function resetSession() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            isRunning = false;
+            currentMinutes = 0;
+            targetMinutes = 0;
+            lastMilestone = 0;
+            
+            document.getElementById('inputSection').classList.remove('hidden');
+            document.getElementById('timerSection').classList.add('hidden');
+            document.getElementById('targetInput').value = '';
+            document.getElementById('goalReached').classList.add('hidden');
+            document.getElementById('milestone').classList.add('hidden');
+        }
+
+        // Load all-time data when page loads
+        loadAllTime();
+    </script>
+</body>
+</html>

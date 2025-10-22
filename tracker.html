@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coding Time Tracker</title>
+    <title>Code Tracker</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             display: flex;
@@ -37,17 +37,19 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        .input-section, .timer-section {
+        .section {
             margin-bottom: 30px;
         }
 
         label {
             display: block;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 10px;
             font-weight: 500;
+            font-size: 15px;
         }
 
         input {
@@ -59,6 +61,7 @@
             color: white;
             font-size: 18px;
             outline: none;
+            transition: all 0.3s;
         }
 
         input::placeholder {
@@ -66,7 +69,9 @@
         }
 
         input:focus {
+            background: rgba(255, 255, 255, 0.25);
             border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
         }
 
         button {
@@ -79,6 +84,31 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button span {
+            position: relative;
+            z-index: 1;
         }
 
         .btn-primary {
@@ -86,19 +116,18 @@
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         .progress-box {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 20px;
             padding: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -108,31 +137,35 @@
         .progress-header {
             display: flex;
             justify-content: space-between;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .progress-bar-container {
             width: 100%;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            height: 14px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
-            transition: width 0.5s;
+            transition: width 0.5s ease;
             border-radius: 10px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
 
         .progress-text {
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 600;
         }
 
         .timer-display {
@@ -141,112 +174,170 @@
         }
 
         .timer-display .time {
-            font-size: 4em;
+            font-size: 4.5em;
             font-weight: bold;
             color: white;
             line-height: 1;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            letter-spacing: -2px;
         }
 
         .timer-display .label {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .notification {
+            text-align: center;
+            font-weight: 600;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .milestone {
-            text-align: center;
+            background: rgba(251, 191, 36, 0.2);
             color: #fbbf24;
-            font-weight: 600;
-            margin-top: 10px;
-            animation: pulse 1s infinite;
+            border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
         .goal-reached {
-            text-align: center;
+            background: rgba(16, 185, 129, 0.2);
             color: #10b981;
-            font-weight: 600;
-            margin-top: 10px;
             font-size: 1.2em;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.02);
+            }
         }
 
         .button-group {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
         .button-group button {
-            flex: 1;
             margin-top: 0;
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.2);
             color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
         .btn-danger {
             background: rgba(239, 68, 68, 0.3);
             color: white;
+            border: 1px solid rgba(239, 68, 68, 0.4);
         }
 
         .btn-danger:hover {
             background: rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
         }
 
-        .alltime-section {
+        .stats-section {
             margin-top: 30px;
             padding-top: 30px;
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .alltime-header {
+        .stat-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 0;
         }
 
-        .alltime-label {
-            color: rgba(255, 255, 255, 0.7);
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .alltime-value {
+        .stat-value {
             font-size: 2em;
             font-weight: bold;
             color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        .alltime-note {
+        .stat-note {
             color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
+            font-size: 11px;
             text-align: right;
             margin-top: 5px;
+            font-style: italic;
         }
 
         .hidden {
             display: none;
         }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .timer-display .time {
+                font-size: 3.5em;
+            }
+        }
+
+        .emoji {
+            font-style: normal;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⏱️ Code Tracker</h1>
+        <h1><span class="emoji">⏱️</span> Code Tracker</h1>
 
-        <div id="inputSection" class="input-section">
-            <label>How many minutes do you want to code today?</label>
-            <input type="number" id="targetInput" placeholder="Enter minutes..." min="1">
-            <button class="btn-primary" onclick="startSession()">🎯 Start Session</button>
+        <div id="inputSection" class="section">
+            <label>How many minutes do you want to code?</label>
+            <input type="number" id="targetInput" placeholder="30" min="1" autofocus>
+            <button class="btn-primary" onclick="startSession()"><span>🎯 Start Session</span></button>
         </div>
 
-        <div id="timerSection" class="timer-section hidden">
+        <div id="timerSection" class="section hidden">
             <div class="progress-box">
                 <div class="progress-header">
                     <span>Today's Goal</span>
@@ -261,152 +352,190 @@
             <div class="timer-display">
                 <div class="time" id="currentTime">0m</div>
                 <div class="label">Current Session</div>
-                <div id="goalReached" class="goal-reached hidden">🎉 Goal Reached!</div>
-                <div id="milestone" class="milestone hidden"></div>
             </div>
 
+            <div id="notifications"></div>
+
             <div class="button-group">
-                <button class="btn-secondary" id="toggleBtn" onclick="toggleTimer()">⏸️ Pause</button>
-                <button class="btn-danger" onclick="resetSession()">🔄 Reset</button>
+                <button class="btn-secondary" id="toggleBtn" onclick="toggleTimer()"><span id="toggleText">⏸️ Pause</span></button>
+                <button class="btn-danger" onclick="resetSession()"><span>🔄 Reset</span></button>
             </div>
         </div>
 
-        <div class="alltime-section">
-            <div class="alltime-header">
-                <div class="alltime-label">📈 All-Time Total</div>
-                <div class="alltime-value" id="alltimeDisplay">0m</div>
+        <div class="stats-section">
+            <div class="stat-row">
+                <div>
+                    <div class="stat-label">
+                        <span class="emoji">📈</span>
+                        <span>All-Time Total</span>
+                    </div>
+                    <div class="stat-note">never resets</div>
+                </div>
+                <div class="stat-value" id="alltimeDisplay">0m</div>
             </div>
-            <div class="alltime-note">Never resets</div>
         </div>
     </div>
 
     <script>
-        let targetMinutes = 0;
-        let currentMinutes = 0;
-        let allTimeMinutes = 0;
-        let isRunning = false;
-        let timerInterval = null;
-        let lastMilestone = 0;
+        const STORAGE_KEY = 'code_tracker_alltime';
+        const UPDATE_INTERVAL = 5000; // 5 seconds
+        const MINUTES_PER_UPDATE = 1/12; // 5 seconds in minutes
 
-        // Load all-time minutes from localStorage
-        function loadAllTime() {
-            const saved = localStorage.getItem('alltime_coded');
+        let state = {
+            targetMinutes: 0,
+            currentMinutes: 0,
+            allTimeMinutes: 0,
+            isRunning: false,
+            timerInterval: null,
+            lastMilestone: 0
+        };
+
+        // Load saved data
+        function init() {
+            const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
-                allTimeMinutes = parseFloat(saved);
+                state.allTimeMinutes = parseFloat(saved);
                 updateAllTimeDisplay();
             }
         }
 
-        // Save all-time minutes to localStorage
-        function saveAllTime() {
-            localStorage.setItem('alltime_coded', allTimeMinutes.toString());
-        }
-
+        // Format time as Xh Ym or Ym
         function formatTime(minutes) {
             const hours = Math.floor(minutes / 60);
             const mins = Math.floor(minutes % 60);
-            if (hours > 0) {
-                return `${hours}h ${mins}m`;
-            }
-            return `${mins}m`;
+            return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
         }
 
+        // Save to localStorage
+        function saveAllTime() {
+            localStorage.setItem(STORAGE_KEY, state.allTimeMinutes.toString());
+        }
+
+        // Update displays
         function updateAllTimeDisplay() {
-            document.getElementById('alltimeDisplay').textContent = formatTime(allTimeMinutes);
+            document.getElementById('alltimeDisplay').textContent = formatTime(state.allTimeMinutes);
         }
 
         function updateCurrentDisplay() {
-            document.getElementById('currentTime').textContent = formatTime(currentMinutes);
+            document.getElementById('currentTime').textContent = formatTime(state.currentMinutes);
         }
 
         function updateProgress() {
-            const progress = (currentMinutes / targetMinutes) * 100;
-            document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
+            const progress = Math.min((state.currentMinutes / state.targetMinutes) * 100, 100);
+            document.getElementById('progressBar').style.width = progress + '%';
             document.getElementById('progressText').textContent = Math.round(progress) + '% complete';
 
-            // Check if goal reached
-            if (currentMinutes >= targetMinutes) {
-                document.getElementById('goalReached').classList.remove('hidden');
+            checkMilestones();
+        }
+
+        function checkMilestones() {
+            const notificationsEl = document.getElementById('notifications');
+            
+            // Check goal completion
+            if (state.currentMinutes >= state.targetMinutes && !document.querySelector('.goal-reached')) {
+                showNotification('🎉 Goal Reached! Keep going!', 'goal-reached');
             }
 
-            // Check for 5-minute milestones
-            const currentMilestone = Math.floor(currentMinutes / 5) * 5;
-            if (currentMilestone > lastMilestone && currentMilestone > 0) {
-                lastMilestone = currentMilestone;
-                const milestoneEl = document.getElementById('milestone');
-                milestoneEl.textContent = `⚡ ${currentMilestone} minutes milestone!`;
-                milestoneEl.classList.remove('hidden');
-                setTimeout(() => {
-                    milestoneEl.classList.add('hidden');
-                }, 3000);
+            // Check 5-minute milestones
+            const currentMilestone = Math.floor(state.currentMinutes / 5) * 5;
+            if (currentMilestone > state.lastMilestone && currentMilestone > 0) {
+                state.lastMilestone = currentMilestone;
+                showNotification(`⚡ ${currentMilestone} minutes! You're on fire!`, 'milestone', 3000);
             }
         }
 
+        function showNotification(message, className, autoHide = 0) {
+            const notificationsEl = document.getElementById('notifications');
+            
+            // Remove existing notification of same type
+            const existing = notificationsEl.querySelector(`.${className}`);
+            if (existing) {
+                if (className === 'goal-reached') return; // Don't duplicate goal reached
+                existing.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${className}`;
+            notification.textContent = message;
+            notificationsEl.appendChild(notification);
+
+            if (autoHide > 0) {
+                setTimeout(function() { notification.remove(); }, autoHide);
+            }
+        }
+
+        // Timer control
         function startSession() {
             const input = document.getElementById('targetInput').value;
-            targetMinutes = parseInt(input);
+            state.targetMinutes = parseInt(input);
             
-            if (!targetMinutes || targetMinutes <= 0) {
-                alert('Please enter a valid number of minutes!');
+            if (!state.targetMinutes || state.targetMinutes <= 0) {
+                alert('Enter a valid number of minutes!');
                 return;
             }
 
             document.getElementById('inputSection').classList.add('hidden');
             document.getElementById('timerSection').classList.remove('hidden');
-            document.getElementById('goalDisplay').textContent = targetMinutes + 'm';
+            document.getElementById('goalDisplay').textContent = state.targetMinutes + 'm';
             
-            currentMinutes = 0;
-            lastMilestone = 0;
+            state.currentMinutes = 0;
+            state.lastMilestone = 0;
+            state.isRunning = true;
+            
             updateCurrentDisplay();
             updateProgress();
-            
-            isRunning = true;
             startTimer();
         }
 
         function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
+            if (state.timerInterval) clearInterval(state.timerInterval);
             
-            timerInterval = setInterval(() => {
-                if (isRunning) {
-                    currentMinutes += 1/12; // 5 seconds = 1/12 minute
-                    allTimeMinutes += 1/12;
+            state.timerInterval = setInterval(() => {
+                if (state.isRunning) {
+                    state.currentMinutes += MINUTES_PER_UPDATE;
+                    state.allTimeMinutes += MINUTES_PER_UPDATE;
                     
                     updateCurrentDisplay();
                     updateAllTimeDisplay();
                     updateProgress();
                     saveAllTime();
                 }
-            }, 5000); // Update every 5 seconds
+            }, UPDATE_INTERVAL);
         }
 
         function toggleTimer() {
-            isRunning = !isRunning;
-            const btn = document.getElementById('toggleBtn');
-            if (isRunning) {
-                btn.textContent = '⏸️ Pause';
-            } else {
-                btn.textContent = '▶️ Resume';
-            }
+            state.isRunning = !state.isRunning;
+            const toggleText = document.getElementById('toggleText');
+            toggleText.textContent = state.isRunning ? '⏸️ Pause' : '▶️ Resume';
         }
 
         function resetSession() {
-            if (timerInterval) clearInterval(timerInterval);
+            if (state.timerInterval) clearInterval(state.timerInterval);
             
-            isRunning = false;
-            currentMinutes = 0;
-            targetMinutes = 0;
-            lastMilestone = 0;
+            state.isRunning = false;
+            state.currentMinutes = 0;
+            state.targetMinutes = 0;
+            state.lastMilestone = 0;
             
             document.getElementById('inputSection').classList.remove('hidden');
             document.getElementById('timerSection').classList.add('hidden');
             document.getElementById('targetInput').value = '';
-            document.getElementById('goalReached').classList.add('hidden');
-            document.getElementById('milestone').classList.add('hidden');
+            document.getElementById('notifications').innerHTML = '';
+            document.getElementById('toggleText').textContent = '⏸️ Pause';
         }
 
-        // Load all-time data when page loads
-        loadAllTime();
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('inputSection').classList.contains('hidden')) {
+                startSession();
+            } else if (e.key === ' ' && !document.getElementById('timerSection').classList.contains('hidden')) {
+                e.preventDefault();
+                toggleTimer();
+            }
+        });
+
+        // Initialize on load
+        init();
     </script>
 </body>
 </html>
